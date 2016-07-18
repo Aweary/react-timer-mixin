@@ -15,13 +15,26 @@ var INTERVALS_ID = 'TimerMixin_intervals';
 var IMMEDIATES_ID = 'TimerMixin_immediates';
 var RAFS_ID = 'TimerMixin_rafs';
 
+var globalClearerMap = {
+  [TIMEOUTS_ID]: GLOBAL.clearTimeout,
+  [INTERVALS_ID]: GLOBAL.clearInterval,
+  [IMMEDIATES_ID]: GLOBAL.clearImmediate,
+  [TIMEOUTS_ID]: GLOBAL.cancelAnimationFrame,
+}
+
+var LOCAL_TIMER_TYPES = [
+  TIMEOUTS_ID,
+  INTERVALS_ID,
+  IMMEDIATES_ID,
+  RAFS_ID
+]
+
 var setter = function(_setter, _clearer, array) {
   return function(callback, delta) {
     var id = _setter(function() {
       _clearer.call(this, id);
       callback.apply(this, arguments);
     }.bind(this), delta);
-
     if (!this[array]) {
       this[array] = [id];
     } else {
@@ -64,6 +77,8 @@ module.exports = {
   INTERVALS_ID: INTERVALS_ID,
   IMMEDIATES_ID: IMMEDIATES_ID,
   RAFS_ID: RAFS_ID,
+  LOCAL_TIMER_TYPES: LOCAL_TIMER_TYPES,
+  globalClearerMap: globalClearerMap,
   _clearTimeout: _clearTimeout,
   _setTimeout: _setTimeout,
   _clearInterval: _clearInterval,

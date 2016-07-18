@@ -14,9 +14,9 @@ global.clearImmediate = jest.genMockFunction();
 global.requestAnimationFrame = jest.genMockFunction();
 global.cancelAnimationFrame = jest.genMockFunction();
 
-jest.dontMock('../shared');
-jest.dontMock('../TimerMixin');
-var TimerMixin = require('../TimerMixin');
+jest.dontMock('../src/shared');
+jest.dontMock('../src/TimerMixin');
+var TimerMixin = require('../src/TimerMixin');
 
 describe('TimerMixin', function() {
   var component;
