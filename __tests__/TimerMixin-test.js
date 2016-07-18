@@ -46,8 +46,12 @@ describe('TimerMixin', function() {
       global[type.clearer].mockClear();
       var cb = jest.genMockFunction();
       var id = component[type.setter](cb, 10);
-
-      expect(global[type.setter]).toBeCalledWith(cb, 10);
+      expect(
+        typeof global[type.setter].mock.calls[0][0]
+      ).toEqual('function');
+      expect(
+        global[type.setter].mock.calls[0][1]
+      ).toEqual(10);
       expect(global[type.clearer]).not.toBeCalled();
       expect(component[type.array]).toEqual([id]);
 
