@@ -9,70 +9,42 @@
  */
 'use strict';
 
-var GLOBAL = typeof window === 'undefined' ? global : window;
+var GLOBAL = require('./shared').GLOBAL;
+var setter = require('./shared').setter;
+var clearer = require('./shared').clearer;
 
-var setter = function(_setter, _clearer, array) {
-  return function(callback, delta) {
-    var id = _setter(function() {
-      _clearer.call(this, id);
-      callback.apply(this, arguments);
-    }.bind(this), delta);
+var TIMEOUTS_ID = require('./shared').TIMEOUTS_ID
+var INTERVALS_ID = require('./shared').INTERVALS_ID
+var IMMEDIATES_ID = require('./shared').IMMEDIATES_ID
+var RAFS_ID = require('./shared').RAFS_ID
 
-    if (!this[array]) {
-      this[array] = [id];
-    } else {
-      this[array].push(id);
-    }
-    return id;
-  };
-};
-
-var clearer = function(_clearer, array) {
-  return function(id) {
-    if (this[array]) {
-      var index = this[array].indexOf(id);
-      if (index !== -1) {
-        this[array].splice(index, 1);
-      }
-    }
-    _clearer(id);
-  };
-};
-
-var _timeouts = 'TimerMixin_timeouts';
-var _clearTimeout = clearer(GLOBAL.clearTimeout, _timeouts);
-var _setTimeout = setter(GLOBAL.setTimeout, _clearTimeout, _timeouts);
-
-var _intervals = 'TimerMixin_intervals';
-var _clearInterval = clearer(GLOBAL.clearInterval, _intervals);
-var _setInterval = setter(GLOBAL.setInterval, function() {/* noop */}, _intervals);
-
-var _immediates = 'TimerMixin_immediates';
-var _clearImmediate = clearer(GLOBAL.clearImmediate, _immediates);
-var _setImmediate = setter(GLOBAL.setImmediate, _clearImmediate, _immediates);
-
-var _rafs = 'TimerMixin_rafs';
-var _cancelAnimationFrame = clearer(GLOBAL.cancelAnimationFrame, _rafs);
-var _requestAnimationFrame = setter(GLOBAL.requestAnimationFrame, _cancelAnimationFrame, _rafs);
+var _clearTimeout = require('./shared')._clearTimeout
+var _setTimeout = require('./shared')._setTimeout
+var _clearInterval = require('./shared')._clearInterval
+var _setInterval = require('./shared')._setInterval
+var _clearImmediate = require('./shared')._clearImmediate
+var _setImmediate = require('./shared')._setImmediate
+var _cancelAnimationFrame = require('./shared')._cancelAnimationFrame
+var _requestAnimationFrame = require('./shared')._requestAnimationFrame
 
 var TimerMixin = {
   componentWillUnmount: function() {
-    this[_timeouts] && this[_timeouts].forEach(function(id) {
+    this[TIMEOUTS_ID] && this[TIMEOUTS_ID].forEach(function(id) {
       GLOBAL.clearTimeout(id);
     });
-    this[_timeouts] = null;
-    this[_intervals] && this[_intervals].forEach(function(id) {
+    this[TIMEOUTS_ID] = null;
+    this[INTERVALS_ID] && this[INTERVALS_ID].forEach(function(id) {
       GLOBAL.clearInterval(id);
     });
-    this[_intervals] = null;
-    this[_immediates] && this[_immediates].forEach(function(id) {
+    this[INTERVALS_ID] = null;
+    this[IMMEDIATES_ID] && this[IMMEDIATES_ID].forEach(function(id) {
       GLOBAL.clearImmediate(id);
     });
-    this[_immediates] = null;
-    this[_rafs] && this[_rafs].forEach(function(id) {
+    this[IMMEDIATES_ID] = null;
+    this[RAFS_ID] && this[RAFS_ID].forEach(function(id) {
       GLOBAL.cancelAnimationFrame(id);
     });
-    this[_rafs] = null;
+    this[RAFS_ID] = null;
   },
 
   setTimeout: _setTimeout,
